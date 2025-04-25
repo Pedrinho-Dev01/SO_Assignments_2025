@@ -51,17 +51,16 @@ def bus_process(env, name, inspection_station, repair_station):
                 if not repair_station_busy[i]:
                     repair_station_busy[i] = True
                     repair_busy_start[i] = env.now
+                    repair_station_index = i
                     break
 
             service_time = random.uniform(REPAIR_TIME_MIN, REPAIR_TIME_MAX)
             yield env.timeout(service_time)
 
             # Free the station and record busy time
-            for i in range(NUM_REPAIR_STATIONS):
-                if repair_station_busy[i] and repair_busy_start[i] > 0:
-                    repair_busy_time += env.now - repair_busy_start[i]
-                    repair_station_busy[i] = False
-                    break
+            if repair_station_busy[repair_station_index]:
+                repair_busy_time += env.now - repair_busy_start[repair_station_index]
+                repair_station_busy[repair_station_index] = False
 
 def bus_arrival(env, inspection_station, repair_station):
     i = 0
