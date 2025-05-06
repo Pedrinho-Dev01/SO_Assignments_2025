@@ -18,10 +18,13 @@ def simulate(params):
 
     time = np.arange(0, t_final, dt)
     x_vals, z_vals = [], []
+    vx_vals, vz_vals = [], []
 
     for _ in time:
         x_vals.append(x)
         z_vals.append(z)
+        vx_vals.append(vx)
+        vz_vals.append(vz)
 
         ax = -u/m * vx**2 * np.sign(vx)
         az = -g - u/m * vz**2 * np.sign(vz)
@@ -31,10 +34,10 @@ def simulate(params):
         x += dt * vx
         z += dt * vz
 
-    return x_vals, z_vals
+    return time, x_vals, z_vals, vx_vals, vz_vals
 
 def main():
-    parser = argparse.ArgumentParser(description="Projectile simulation with air resistance using Euler method.")
+    parser = argparse.ArgumentParser(description="Projectile simulation with air resistance using Forward Euler method.")
     parser.add_argument("--x0", type=float, help="Initial x position")
     parser.add_argument("--z0", type=float, help="Initial z position")
     parser.add_argument("--vx0", type=float, help="Initial x velocity")
@@ -48,7 +51,7 @@ def main():
 
     args = parser.parse_args()
 
-    # Load parameters
+    # Load parameters from file or command-line arguments
     if args.param_file:
         try:
             with open(args.param_file, 'r') as f:
@@ -64,14 +67,28 @@ def main():
         params = vars(args)
 
     # Run simulation
-    x_vals, z_vals = simulate(params)
+    time, x_vals, z_vals, vx_vals, vz_vals = simulate(params)
 
-    # Plot result
+    # Plot positions
+    plt.figure(figsize=(10,4))
+    plt.subplot(1,2,1)
     plt.plot(x_vals, z_vals)
-    plt.xlabel("x position")
-    plt.ylabel("z position")
-    plt.title("Projectile Motion with Air Resistance")
+    plt.xlabel("X Position")
+    plt.ylabel("Z Position")
+    plt.title("Trajectory")
     plt.grid()
+
+    # Plot speeds
+    plt.subplot(1,2,2)
+    plt.plot(time, vx_vals, label='vx')
+    plt.plot(time, vz_vals, label='vz')
+    plt.xlabel("Time")
+    plt.ylabel("Speed")
+    plt.title("Velocity evolution")
+    plt.legend()
+    plt.grid()
+
+    plt.tight_layout()
     plt.show()
 
 if __name__ == "__main__":
