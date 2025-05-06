@@ -10,14 +10,14 @@ An assigment for the Simulation and Optimization course.
 ## 2.1
 
 ### Command Line Arguments
-x0 = Initial x position
-z0 = Initial z position
-vx0 = Initial x velocity
-vz0 = Initial z velocity
-u = Drag coefficient
-m = Mass of the object
-g = Gravity <!-- Defaulted to 9.81, not necessary to use parameter -->
-dt = Time step
+x0 = Initial x position \
+z0 = Initial z position \
+vx0 = Initial x velocity \
+vz0 = Initial z velocity \
+u = Drag coefficient \
+m = Mass of the object \
+g = Gravity <!-- Defaulted to 9.81, not necessary to use parameter --> \
+dt = Time step \
 t_final = Final time
 
 ```bash
