@@ -8,7 +8,15 @@ An assigment for the Simulation and Optimization course.
 
 # Usage 
 
-Run the commands provided below in the **root** directory of the repository. 
+Run all the commands provided below in the **root** directory of the repository. 
+
+```bash
+python3 -m venv venv
+
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
 
 ## Exercise 1:
 
