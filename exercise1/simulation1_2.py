@@ -85,28 +85,17 @@ def run_simulation(mean_interarrival):
     env.process(monitor_queues(env, inspection_station, repair_station))
     env.run(until=SIM_TIME)
 
+def format_time(hours_float):
+    total_seconds = int(hours_float * 3600)
+    h = total_seconds // 3600
+    m = (total_seconds % 3600) // 60
+    s = total_seconds % 60
+    return f"{h:02d}:{m:02d}:{s:02d}"
+
 def main():
     global inspection_wait_times, repair_wait_times, inspection_queue_lengths, repair_queue_lengths
     global inspection_utilization_time, repair_busy_time, repair_busy_start, repair_station_busy
     
-    
-    # ---------------------------------------------Ex 1.1---------------------------------------------
-        
-    MEAN_INTERARRIVAL = 2  # hours
-
-    run_simulation(MEAN_INTERARRIVAL)
-
-    # ---- Results ----
-    print("Simulation Results for Exercise 1.1 (160 hours):")
-    print(f"Average delay in inspection queue: {statistics.mean(inspection_wait_times):.2f} hours")
-    if repair_wait_times:
-        print(f"Average delay in repair queue: {statistics.mean(repair_wait_times):.2f} hours")
-    else:
-        print("No buses required repair.")
-    print(f"Average inspection queue length: {statistics.mean(inspection_queue_lengths):.2f}")
-    print(f"Average repair queue length: {statistics.mean(repair_queue_lengths):.2f}")
-    print(f"Utilization of inspection station: {inspection_utilization_time / SIM_TIME:.2f}")
-    print(f"Utilization of repair stations: {(repair_busy_time / SIM_TIME) / NUM_REPAIR_STATIONS:.2f}")
     
     # ---------------------------------------------Ex 1.2---------------------------------------------
         
@@ -153,15 +142,16 @@ def main():
         
         # ---- Results ----
         print(f"\nMean Interarrival Time: {MEAN_INTERARRIVAL:.2f} hours")
-        print(f"Average delay in inspection queue: {inspection_queue_delay:.2f} hours")
+        print(f"Average delay in inspection queue: {format_time(inspection_queue_delay)} (hh:mm:ss)")
+
         if repair_wait_times:
-            print(f"Average delay in repair queue: {repair_queue_delay:.2f} hours")
+            print(f"Average delay in repair queue: {format_time(repair_queue_delay)} (hh:mm:ss)")
         else:
             print("No buses required repair.")
-        print(f"Average inspection queue length: {inspection_queue_length:.2f}")
-        print(f"Average repair queue length: {repair_queue_length:.2f}")
-        print(f"Utilization of inspection station: {utilization_inspection:.2f}")
-        print(f"Utilization of repair stations: {utilization_repair:.2f}")
+        print(f"Average inspection queue length: {inspection_queue_length:.2f} buses")
+        print(f"Average repair queue length: {repair_queue_length:.2f} buses")
+        print(f"Utilization of inspection station: {utilization_inspection * 100:.2f}%")
+        print(f"Utilization of repair stations: {utilization_repair * 100:.2f}%")
     
         if (utilization_inspection > 0.90 
             or utilization_repair > 0.85 
@@ -179,7 +169,7 @@ def main():
     if critical_interarrival:
         # The maximum arrival rate is the inverse of the minimum stable interarrival time
         max_arrival_rate = 1 / critical_interarrival
-        print(f"Minimum mean interarrival time that can be handled: {critical_interarrival:.1f} hours")
+        print(f"Minimum mean interarrival time that can be handled: {format_time(critical_interarrival)} (hh:mm:ss)")
         print(f"Maximum bus arrival rate: {max_arrival_rate:.2f} buses per hour")
         print(f"Maximum buses per day: {24 * max_arrival_rate:.1f} buses")
     else:

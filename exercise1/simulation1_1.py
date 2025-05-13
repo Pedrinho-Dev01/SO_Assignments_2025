@@ -75,6 +75,13 @@ def monitor_queues(env, inspection_station, repair_station):
         repair_queue_lengths.append(len(repair_station.queue))
         yield env.timeout(0.5)  # check every 30 minutes
 
+def format_time(hours_float):
+    total_seconds = int(hours_float * 3600)
+    h = total_seconds // 3600
+    m = (total_seconds % 3600) // 60
+    s = total_seconds % 60
+    return f"{h:02d}:{m:02d}:{s:02d}"
+
 def main():
     random.seed(42)
     env = simpy.Environment()
@@ -88,15 +95,21 @@ def main():
 
     # ---- Results ----
     print("Simulation Results (160 hours):")
-    print(f"Average delay in inspection queue: {statistics.mean(inspection_wait_times):.2f} hours")
+
+    avg_inspection_delay = statistics.mean(inspection_wait_times)
+    print(f"Average delay in inspection queue: {format_time(avg_inspection_delay)} (hh:mm:ss)")
+
     if repair_wait_times:
-        print(f"Average delay in repair queue: {statistics.mean(repair_wait_times):.2f} hours")
+        avg_repair_delay = statistics.mean(repair_wait_times)
+        print(f"Average delay in repair queue: {format_time(avg_repair_delay)} (hh:mm:ss)")
     else:
         print("No buses required repair.")
-    print(f"Average inspection queue length: {statistics.mean(inspection_queue_lengths):.2f}")
-    print(f"Average repair queue length: {statistics.mean(repair_queue_lengths):.2f}")
-    print(f"Utilization of inspection station: {inspection_utilization_time / SIM_TIME:.2f}")
-    print(f"Utilization of repair stations: {(repair_busy_time / SIM_TIME) / NUM_REPAIR_STATIONS:.2f}")
+
+    print(f"Average inspection queue length: {statistics.mean(inspection_queue_lengths):.2f} buses")
+    print(f"Average repair queue length: {statistics.mean(repair_queue_lengths):.2f} buses")
+
+    print(f"Utilization of inspection station: {(inspection_utilization_time / SIM_TIME) * 100:.2f}%")
+    print(f"Utilization of repair stations (average): {(repair_busy_time / SIM_TIME / NUM_REPAIR_STATIONS) * 100:.2f}%")
 
 if __name__ == '__main__':
     main()
