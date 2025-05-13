@@ -6,9 +6,23 @@ An assigment for the Simulation and Optimization course.
 - Daniel Pedrinho Nº107378
 - Sara Almeida Nº108796
 
-## Usage (Exercise 2):
+# Usage 
 
-Run the commands provided in the **root** directory of the repository. 
+Run the commands provided below in the **root** directory of the repository. 
+
+## Exercise 1:
+
+### Exercise 1.1
+```bash
+python3 exercise1/simulation1_1.py 
+```
+
+### Exercise 1.2
+```bash
+python3 exercise1/simulation1_2.py 
+```
+
+## Exercise 2:
 
 ### Command Line Arguments
 x0 = Initial x position \
