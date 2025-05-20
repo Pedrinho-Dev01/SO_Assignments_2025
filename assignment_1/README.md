@@ -1,4 +1,4 @@
-# SO_mini_assignment
+# SO Mini Assignment 1
 
 An assigment for the Simulation and Optimization course.
 
