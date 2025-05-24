@@ -3,8 +3,8 @@ function generate_sdn_lp()
     num_nodes = 200;
     Cmax = 1000;
     n_controllers = 12;
-    links_file = 'Links200.txt';
-    lengths_file = 'L200.txt';
+    links_file = '../Links200.txt';
+    lengths_file = '../L200.txt';
     lp_filename = 'sdn_problem.lp';
 
     % STEP 1: Load graph and compute ACTUAL shortest paths
