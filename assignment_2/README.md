@@ -8,7 +8,7 @@ An assigment for the Simulation and Optimization course.
 
 ## Exact LP Method Usage
 
-1. Inside the folder "assignment2", run the following command to generate the LP file:
+1. Inside the folder "assignment2/exact_method", run the following command to generate the LP file:
 
 ```matlab
 generate_sdn_lp
