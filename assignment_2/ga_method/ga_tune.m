@@ -10,6 +10,7 @@ popul_sizes = [20, 50, 100, 150, 200];
 mutation_probs = [0.01, 0.05, 0.1];
 elitism_counts = [1, 2];
 n_runs = 3;  % Short for tuning
+max_time = 30; 
 
 results = [];
 
@@ -21,7 +22,7 @@ for p = 1:length(popul_sizes)
             elite = elitism_counts(e);
 
             fprintf('Testing GA with Pop=%d, Mut=%.2f, Elitism=%d\n', pop, mut, elite);
-            stats = ga_algorithm(pop, mut, elite, n_runs);
+            stats = ga_algorithm(pop, mut, elite, n_runs, max_time);
             results = [results; pop, mut, elite, stats.min, stats.mean, stats.max];
         end
     end

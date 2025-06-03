@@ -5,11 +5,13 @@ clc; clear;
 [popul_size, mut_rate, elitism] = ga_tune();
 
 n_runs = 10;
+max_time = 30;
+
 fprintf('\nRunning final GA with best parameters...\n');
 fprintf('  PopSize = %d, MutationRate = %.2f, Elitism = %d\n', ...
         popul_size, mut_rate, elitism);
 
-ga_results = ga_algorithm(popul_size, mut_rate, elitism, n_runs);
+ga_results = ga_algorithm(popul_size, mut_rate, elitism, n_runs, max_time);
 
 fprintf('\nFinal Results:\n');
 disp(ga_results);

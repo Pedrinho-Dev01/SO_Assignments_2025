@@ -1,4 +1,4 @@
-function ga_calculate = ga_algorithm(popul_size, prob_mutation, elitism_count, n_runs)
+function ga_calculate = ga_algorithm(popul_size, prob_mutation, elitism_count, n_runs, max_time)
     % Genetic Algorithm with elitist selection for SDN controller placement
     % Inputs:
     %   popul_size     - number of individuals in population
@@ -11,7 +11,6 @@ function ga_calculate = ga_algorithm(popul_size, prob_mutation, elitism_count, n
     n_controllers = 12;
     n_nodes = 200;
     Cmax = 1000;
-    max_time = 30;
 
     L = load('../L200.txt');
     dist_matrix = preprocess_distances(L);
@@ -38,13 +37,13 @@ function ga_calculate = ga_algorithm(popul_size, prob_mutation, elitism_count, n
 
         % Evolve population
         while toc(t_start) < max_time
-            offspring = {};
-            while numel(offspring) < popul_size
+            new_population = {};
+            while numel(new_population) < popul_size
                 p1 = tournament_selection(population, fitness);
                 p2 = tournament_selection(population, fitness);
                 child = crossover(p1, p2, n_controllers, infeasible_pairs);
                 child = mutate(child, n_nodes, prob_mutation, infeasible_pairs);
-                offspring{end+1} = child;
+                new_population{end+1} = child;
             end
 
             % Select elitism_count best from old population
@@ -52,17 +51,17 @@ function ga_calculate = ga_algorithm(popul_size, prob_mutation, elitism_count, n
             elite_individuals = population(idx_old(1:elitism_count));
             elite_fitness = fitness(idx_old(1:elitism_count));
             
-            % Evaluate offspring
-            offspring_fitness = evaluate_population(offspring, dist_matrix);
+            % Evaluate new_population
+            new_population_fitness = evaluate_population(new_population, dist_matrix);
             
-            % Select the best remaining individuals from offspring
+            % Select the best remaining individuals from new_population
             remaining_needed = popul_size - elitism_count;
-            [~, idx_off] = sort(offspring_fitness);
-            selected_offspring = offspring(idx_off(1:remaining_needed));
-            selected_fitness = offspring_fitness(idx_off(1:remaining_needed));
+            [~, idx_off] = sort(new_population_fitness);
+            selected_new_population = new_population(idx_off(1:remaining_needed));
+            selected_fitness = new_population_fitness(idx_off(1:remaining_needed));
             
             % Combine to form next generation
-            population = [elite_individuals, selected_offspring];
+            population = [elite_individuals, selected_new_population];
             fitness = [elite_fitness; selected_fitness];
 
 
@@ -88,11 +87,12 @@ end
 
 % === Helper functions ===
 
+% Getting a distance matrix with shortest path lengths between all node pairs
 function dist_matrix = preprocess_distances(L)
     n = size(L,1);
     L(L == 0 & ~eye(n)) = inf;
     L(eye(n) == 1) = 0;
-    dist_matrix = floyd_warshall(L);
+    dist_matrix = floyd_warshall(L); % computes the shortest paths
 end
 
 function D = floyd_warshall(G)
@@ -109,6 +109,7 @@ function D = floyd_warshall(G)
     end
 end
 
+% Function to check if a set of controllers is valid - distances <= Cmax)
 function valid = is_valid(controllers, infeasible_pairs)
     if numel(controllers) < 2
         valid = true;
@@ -125,7 +126,7 @@ function valid = is_valid(controllers, infeasible_pairs)
     valid = true;
 end
 
-
+% Computes the objective value of each individual in the population
 function fitness = evaluate_population(population, dist_matrix)
     fitness = zeros(numel(population), 1);
     for i = 1:numel(population)
@@ -133,6 +134,7 @@ function fitness = evaluate_population(population, dist_matrix)
     end
 end
 
+% Calculates the fitness of a solution
 function obj = compute_objective(controllers, dist_matrix)
     total = 0;
     for j = 1:size(dist_matrix, 1)
@@ -142,6 +144,7 @@ function obj = compute_objective(controllers, dist_matrix)
     obj = total / size(dist_matrix, 1);
 end
 
+% Selection of an individual using tournament selection
 function selected = tournament_selection(population, fitness)
     k = 2;
     candidates = randperm(numel(population), k);
@@ -149,6 +152,7 @@ function selected = tournament_selection(population, fitness)
     selected = population{candidates(idx)};
 end
 
+% Child solution by combining two parents solutions. 
 function child = crossover(p1, p2, n_controllers, infeasible_pairs)
     common = intersect(p1, p2);
     remaining = setdiff(union(p1, p2), common);
@@ -174,10 +178,11 @@ function child = crossover(p1, p2, n_controllers, infeasible_pairs)
     end
 end
 
+% Tries to modify one gene in the individuall
 function mutated = mutate(ind, num_nodes, prob_mutation, infeasible_pairs)
     mutated = ind;
     if rand < prob_mutation
-        for attempt = 1:10
+        for attempt = 1:10 %10 attempts are made to find a valid mutation
             idx = randi(numel(ind));
             new_gene = randi(num_nodes);
             trial = mutated;
