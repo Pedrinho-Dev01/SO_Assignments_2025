@@ -9,7 +9,7 @@ function [best_popul_size, best_mutation_prob, best_elitism] = ga_tune()
 popul_sizes = [20, 50, 100, 150, 200];
 mutation_probs = [0.01, 0.05, 0.1];
 elitism_counts = [1, 2];
-n_runs = 3;  % Short for tuning
+n_runs = 10;  % Short for tuning
 max_time = 30; 
 
 results = [];
@@ -32,6 +32,8 @@ end
 results_table = array2table(results, ...
     'VariableNames', {'PopSize','MutationRate','Elitism','Min','Mean','Max'});
 disp(results_table);
+
+writetable(results_table, 'ga_tuning_results_table.csv');
 
 % Identify best by lowest Mean
 [~, best_idx] = min(results(:,5));

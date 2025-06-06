@@ -83,6 +83,7 @@ function ga_calculate = ga_algorithm(popul_size, prob_mutation, elitism_count, n
     ga_calculate.min = min(best_values);
     ga_calculate.mean = mean(best_values);
     ga_calculate.max = max(best_values);
+    ga_calculate.all = best_values;
 end
 
 % === Helper functions ===
@@ -109,7 +110,7 @@ function D = floyd_warshall(G)
     end
 end
 
-% Function to check if a set of controllers is valid - distances <= Cmax)
+% Function to check if a set of controllers is valid - distances <= Cmax
 function valid = is_valid(controllers, infeasible_pairs)
     if numel(controllers) < 2
         valid = true;
