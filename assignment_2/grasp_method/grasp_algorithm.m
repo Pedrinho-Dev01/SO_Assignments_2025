@@ -25,12 +25,14 @@ function stats = grasp_algorithm(alpha, max_time, n_runs)
     % Precompute infeasible controller pairs (distance > Cmax)
     infeasible_pairs = dist_matrix > Cmax & ~eye(num_nodes);
 
-    % Store objective values for statistics
+    % Store objective values and best controllers for statistics
     obj_values = zeros(n_runs,1);
+    best_controllers_all = cell(n_runs,1);  % Store best controllers for each run
 
     for run = 1:n_runs
         t_start = tic;
         best_obj = Inf;
+        best_controllers_run = [];  % Best controllers for this run
         while toc(t_start) < max_time
             controllers = grasp_construct(dist_matrix, infeasible_pairs, n_controllers, alpha);
             assignment = assign_nodes(dist_matrix, controllers);
@@ -38,21 +40,40 @@ function stats = grasp_algorithm(alpha, max_time, n_runs)
             [controllers_ls, assignment_ls, obj_ls] = local_search(dist_matrix, infeasible_pairs, controllers, assignment, obj, n_controllers);
             if obj_ls < best_obj
                 best_obj = obj_ls;
+                best_controllers_run = controllers_ls;  % Update best controllers
             end
         end
         obj_values(run) = best_obj;
+        best_controllers_all{run} = best_controllers_run;  % Store best controllers for this run
     end
+
+    % Find the overall best run
+    [min_obj, best_run_idx] = min(obj_values);
+    overall_best_controllers = best_controllers_all{best_run_idx};
 
     % Report statistics
     fprintf('\nGRASP results over %d runs (each %.0f seconds):\n', n_runs, max_time);
     fprintf('Minimum objective: %.4f\n', min(obj_values));
     fprintf('Average objective: %.4f\n', mean(obj_values));
     fprintf('Maximum objective: %.4f\n', max(obj_values));
+    
+    % Print best controllers from each run
+    fprintf('\nBest controllers from each run:\n');
+    for run = 1:n_runs
+        fprintf('Run %d (obj=%.4f): [%s]\n', run, obj_values(run), ...
+                num2str(sort(best_controllers_all{run})));
+    end
+    
+    % Print overall best controllers
+    fprintf('\nOverall best controllers (from run %d): [%s]\n', ...
+            best_run_idx, num2str(sort(overall_best_controllers)));
 
     % Return stats
     stats.min = min(obj_values);
     stats.mean = mean(obj_values);
     stats.max = max(obj_values);
+    stats.best_controllers = overall_best_controllers;  % Add best controllers to stats
+    stats.all_best_controllers = best_controllers_all;  % Add all best controllers to stats
 end
 
 function controllers = grasp_construct(dist_matrix, infeasible_pairs, n_controllers, alpha)
